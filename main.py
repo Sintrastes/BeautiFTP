@@ -1,4 +1,6 @@
+#!/usr/bin/python3
 from gi.repository import Gtk, Gdk, GdkPixbuf
+import ftplib
 
 class Application:
     def __init__(self):
@@ -7,6 +9,7 @@ class Application:
         self.builder.connect_signals(self)
         
         #### Application Windows
+
         self.mainWindow         = self.builder.get_object("Main Window")
         self.loadingScreen      = self.builder.get_object("Loading Screen")
         self.permissionChange   = self.builder.get_object("Permission Change")
@@ -14,14 +17,24 @@ class Application:
         self.openingWindow      = self.builder.get_object("Opening Window")
 
         #### Application Objects
-        ## Permission Change Window
-        self.owner_write   = self.builder.get_object("Owner Write")
-        self.owner_read    = self.builder.get_object("Owner Read")
-        self.owner_execute = self.builder.get_object("Owner Execute")
+        ## Connect Tab
+        self.connectioninfo = self.builder.get_object("Connection Info")
+        self.username_entry = self.builder.get_object("Username Entry")
+        self.password_entry = self.builder.get_object("Password Entry")
+        self.address_entry  = self.builder.get_object("Address Entry")
 
-        self.group_write   = self.builder.get_object("Group Write")
-        self.group_read    = self.builder.get_object("Group Read")
-        self.group_execute = self.builder.get_object("Group Execute")
+        ## Browse Tab
+        self.directory_entry = self.builder.get_object("Directory Entry")
+        self.treeview = self.builder.get_object("treeview")
+
+        ## Permission Change Window
+        self.owner_write    = self.builder.get_object("Owner Write")
+        self.owner_read     = self.builder.get_object("Owner Read")
+        self.owner_execute  = self.builder.get_object("Owner Execute")
+
+        self.group_write    = self.builder.get_object("Group Write")
+        self.group_read     = self.builder.get_object("Group Read")
+        self.group_execute  = self.builder.get_object("Group Execute")
 
         self.public_write   = self.builder.get_object("Public Write")
         self.public_read    = self.builder.get_object("Public Read")
@@ -34,15 +47,21 @@ class Application:
         self.loader=GdkPixbuf.PixbufAnimation.new_from_file("nyan2.gif")
         self.canvas.set_from_animation(self.loader)
 
-        #
         self.apply_all        = self.builder.get_object("Apply All")
         self.files_only       = self.builder.get_object("Files Only")
         self.directories_only = self.builder.get_object("Directories Only")
         self.null_select      = self.builder.get_object("Null Select")
-        self.recurse_buttons  = [self.apply_all,self.files_only,self.directories_only,self.null_select]
+        self.recurse_buttons  = [self.apply_all, self.files_only, self.directories_only, self.null_select]
         
         #### Application State
+        ## Connection data
+        self.connected    = False
+        self.connected_to = ""
 
+        ## FTP directory data
+        self.treestore = self.builder.get_object("treeview")
+
+        # Open the welcome window
         self.openingWindow.show_all()
 
 #### Opening Window Handler
@@ -54,13 +73,14 @@ class Application:
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
 
+## Connect Tab
     def connectHandler(self, button):
-        print("Hello World!")
+        pass
 
     def disconnectHandler(self,x):
-        
         self.openLoading(x)
 
+## Browse tab
     def deleteHandler(self,x):
         pass
 
@@ -70,16 +90,13 @@ class Application:
     def uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
+
     def permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
     def directoryHandler(self,x):
         pass
-
-    def openLoading(self, button):
-        self.loadingScreen.connect('delete-event', lambda w, e: w.hide() or True)
-        self.loadingScreen.show_all()
 
 #### Loading Window Handlers
     def LDCancelHandler(self,x):
@@ -108,13 +125,17 @@ class Application:
         else:
             for x in self.recurse_buttons:
                 x.set_sensitive(False)
+
     def PC_onDestroy(self,x):
         self.permissionChange.hide()
 
+#### Misc. Methods
+    def openLoading(self, button):
+        self.loadingScreen.connect('delete-event', lambda w, e: w.hide() or True)
+        self.loadingScreen.show_all()
 
 def main():
     applicaton = Application()
-
     Gtk.main()
 
 if __name__ == "__main__":

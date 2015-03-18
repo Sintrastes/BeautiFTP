@@ -267,7 +267,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry1">
+              <object class="GtkEntry" id="Password Entry">
                 <property name="width_request">264</property>
                 <property name="height_request">27</property>
                 <property name="visible">True</property>
@@ -302,7 +302,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry2">
+              <object class="GtkEntry" id="Username Entry">
                 <property name="width_request">262</property>
                 <property name="height_request">26</property>
                 <property name="visible">True</property>
@@ -319,7 +319,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry3">
+              <object class="GtkEntry" id="Address Entry">
                 <property name="width_request">264</property>
                 <property name="height_request">29</property>
                 <property name="visible">True</property>
@@ -376,11 +376,12 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="label8">
-                <property name="width_request">100</property>
-                <property name="height_request">80</property>
+              <object class="GtkLabel" id="Connection Info">
+                <property name="width_request">583</property>
+                <property name="height_request">99</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="ypad">6</property>
                 <property name="label" translatable="yes">Connected</property>
               </object>
             </child>
@@ -401,12 +402,12 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkTreeView" id="treeview1">
+              <object class="GtkTreeView" id="treeview">
                 <property name="width_request">567</property>
                 <property name="height_request">289</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">treestore1</property>
+                <property name="model">treestore</property>
               </object>
               <packing>
                 <property name="x">12</property>
@@ -416,7 +417,7 @@
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label" translatable="yes">delete selected</property>
-                <property name="width_request">111</property>
+                <property name="width_request">115</property>
                 <property name="height_request">28</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -446,7 +447,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry4">
+              <object class="GtkEntry" id="Directory Entry">
                 <property name="width_request">264</property>
                 <property name="height_request">28</property>
                 <property name="visible">True</property>
@@ -1108,7 +1109,7 @@
       <action-widget response="0">button13</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkTreeStore" id="treestore1">
+  <object class="GtkTreeStore" id="treestore">
     <columns>
       <!-- column-name gchar1 -->
       <column type="gchar"/>
