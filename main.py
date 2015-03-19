@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from gi.repository import Gtk, Gdk, GdkPixbuf
-import ftplib
+from ftplib import FTP
 
 class Application:
     def __init__(self):
@@ -74,11 +74,15 @@ class Application:
         Gtk.main_quit(*args)
 
 ## Connect Tab
+    # Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
     def connectHandler(self, button):
-        pass
+        server = FTP("drwestfall.net")
+        print(server.login("ftp02", "student")) # Currently wrapped in a print statement for testing purposes
 
+    # Quits the current session, currently broken since it can't see "server", a local variable connect handler
     def disconnectHandler(self,x):
-        self.openLoading(x)
+        server.quit()
+        #self.openLoading(x)
 
 ## Browse tab
     def deleteHandler(self,x):
@@ -112,7 +116,7 @@ class Application:
         pass
 
 #### Permission Change Window Handlers
-    def PCCancelHandler(self,x):
+    def PC_Cancel_Handler(self,x):
         pass
 
     def PCOKHandler(self,x):
