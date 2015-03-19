@@ -55,6 +55,7 @@ class Application:
         
         #### Application State
         ## Connection data
+        self.server       = None
         self.connected    = False
         self.connected_to = ""
 
@@ -76,18 +77,18 @@ class Application:
 ## Connect Tab
     # Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
     def connectHandler(self, button):
-        server = FTP("drwestfall.net")
-        print(server.login("ftp02", "student")) # Currently wrapped in a print statement for testing purposes
-
-    # Quits the current session, currently broken since it can't see "server", a local variable connect handler
-    ### Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
-    def connectHandler(self, button):
-        server = FTP("drwestfall.net")
-        print(server.login("ftp02", "student"))     #currently wrapped in a print statement for testing purposes
-
-    ### Quits the current session, currently broken since it can't see "server", a local variable connect handler
+        self.server = FTP("drwestfall.net")
+        print(self.server.login("ftp02", "student")) # Currently wrapped in a print statement for testing purposes
+        self.connected = True # Is there already a bool for this in the FTP object? I'm not sure.
+    
+    # Quits the current session
     def disconnectHandler(self,x):
-        server.quit()
+        if( (self.server != None) and self.connected):
+            self.server.quit()
+            self.connected = False
+            print("Disconnected")
+        else:
+            print("Not connected")
         #self.openLoading(x)
 
 ## Browse tab
