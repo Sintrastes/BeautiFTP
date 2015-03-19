@@ -1020,6 +1020,7 @@
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="PC_Cancel_Handler" swapped="no"/>
           </object>
           <packing>
             <property name="x">10</property>

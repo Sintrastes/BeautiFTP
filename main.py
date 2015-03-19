@@ -73,6 +73,7 @@ class Application:
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
 
+<<<<<<< HEAD
 ## Connect Tab
     # Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
     def connectHandler(self, button):
@@ -80,6 +81,14 @@ class Application:
         print(server.login("ftp02", "student")) # Currently wrapped in a print statement for testing purposes
 
     # Quits the current session, currently broken since it can't see "server", a local variable connect handler
+=======
+    ### Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
+    def connectHandler(self, button):
+        server = FTP("drwestfall.net")
+        print(server.login("ftp02", "student"))     #currently wrapped in a print statement for testing purposes
+
+    ### Quits the current session, currently broken since it can't see "server", a local variable connect handler
+>>>>>>> 108e84501e2b0b4ab8e605c4c9fc72fb8d47a968
     def disconnectHandler(self,x):
         server.quit()
         #self.openLoading(x)
