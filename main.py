@@ -77,9 +77,14 @@ class Application:
 ## Connect Tab
     # Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
     def connectHandler(self, button):
-        self.server = FTP("drwestfall.net")
-        print(self.server.login("ftp02", "student")) # Currently wrapped in a print statement for testing purposes
-        self.connected = True # Is there already a bool for this in the FTP object? I'm not sure.
+        
+        #Connect to the server
+        try:
+            self.server = FTP(self.address_entry.get_text())
+            self.server.login(self.username_entry.get_text(), self.password_entry.get_text())
+            self.connected = True #There is no built-in bool
+        except: #need a specific catch statement (right now it catches ALL errors, not just login)
+            print("Connection failed: Incorrect Login Information") 
     
     # Quits the current session
     def disconnectHandler(self,x):
