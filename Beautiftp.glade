@@ -2,6 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkListStore" id="Directory Model"/>
   <object class="GtkWindow" id="Loading Screen">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">BeautiFTP</property>
@@ -402,12 +403,12 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkTreeView" id="treeview">
+              <object class="GtkTreeView" id="Directory Display">
                 <property name="width_request">567</property>
                 <property name="height_request">289</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="model">treestore</property>
+                <property name="model">Directory Model</property>
               </object>
               <packing>
                 <property name="x">12</property>
@@ -1109,11 +1110,5 @@
       <action-widget response="0">button12</action-widget>
       <action-widget response="0">button13</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkTreeStore" id="treestore">
-    <columns>
-      <!-- column-name gchar1 -->
-      <column type="gchar"/>
-    </columns>
   </object>
 </interface>

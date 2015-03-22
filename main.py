@@ -25,7 +25,7 @@ class Application:
 
         ## Browse Tab
         self.directory_entry = self.builder.get_object("Directory Entry")
-        self.treeview = self.builder.get_object("treeview")
+        self.directory_display = self.builder.get_object("Directory Display")
 
         ## Permission Change Window
         self.owner_write    = self.builder.get_object("Owner Write")
@@ -60,7 +60,7 @@ class Application:
         self.connected_to = ""
 
         ## FTP directory data
-        self.treestore = self.builder.get_object("treeview")
+        self.directory_model = self.builder.get_object("Directory Model")
 
         # Open the welcome window
         self.openingWindow.show_all()
