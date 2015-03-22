@@ -275,7 +275,7 @@
                 <property name="height_request">27</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="invisible_char">●</property>
+                <property name="visibility">False</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
@@ -387,9 +387,10 @@
                 <property name="height_request">99</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0.0099999997764825821</property>
-                <property name="ypad">6</property>
-                <property name="label" translatable="yes">Connected</property>
+                <property name="xalign">0.029999999329447746</property>
+                <property name="yalign">0.51999998092651367</property>
+                <property name="ypad">11</property>
+                <property name="label" translatable="yes">Disconnected</property>
               </object>
             </child>
           </object>

@@ -4,6 +4,20 @@ from ftplib import FTP
 import ftplib
 import threading
 
+class ConnectionThread(threading.Thread):
+    def __init__(self,ref):
+        threading.Thread.__init__(self)
+        self.ref = ref
+    def run(self):
+        try:      
+            self.ref.connectioninfo.set_text("Connecting...")
+            self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
+            self.ref.connectioninfo.set_text("Connected")
+            self.ref.connected = True 
+        # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
+        except ftplib.all_errors as err: 
+            self.ref.connectioninfo.set_text("Could not connect: "+str(err))
+
 class Application:
     def __init__(self):
         self.builder = Gtk.Builder()
@@ -80,29 +94,21 @@ class Application:
     def CN_connectHandler(self, button):
         
         # Connect to the server
-        try:
             self.server = FTP(self.address_entry.get_text())
-            # TODO: Spawn a new thread so waiting on the server doesn't freeze up the UI. 
-            # We'll probably have to do this with most of our handlers in the future so
-            # parts of the application don't get locked when doing other things.
-            # This also might mean we should make a seperate class for application variables
             # in charge of arbitrating access to them.
-            thread = threading.Thread(target = 
-                lambda: self.server.login(self.username_entry.get_text(), self.password_entry.get_text()))
+            thread = ConnectionThread(self)
             thread.daemon = True
             thread.start()
-            self.connected = True 
-        # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
-        except ftplib.all_errors as err: 
-            print(err) 
     
     # Quits the current session
     def CN_disconnectHandler(self,x):
         if( (self.server != None) and self.connected):
             self.server.quit()
             self.connected = False
+            self.connectioninfo.set_text("Disconnected")
             print("Disconnected")
         else:
+            self.connectioninfo.set_text("Disconnected")
             print("Not connected")
         #self.openLoading(x)
 
@@ -139,7 +145,7 @@ class Application:
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
-        pass
+        self.permissionChange.hide()
 
     def PC_OKHandler(self,x):
         print(self.public_read.get_active())
