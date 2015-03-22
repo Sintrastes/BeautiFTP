@@ -2,6 +2,7 @@
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from ftplib import FTP
 import ftplib
+import threading
 
 class Application:
     def __init__(self):
@@ -81,7 +82,15 @@ class Application:
         # Connect to the server
         try:
             self.server = FTP(self.address_entry.get_text())
-            self.server.login(self.username_entry.get_text(), self.password_entry.get_text())
+            # TODO: Spawn a new thread so waiting on the server doesn't freeze up the UI. 
+            # We'll probably have to do this with most of our handlers in the future so
+            # parts of the application don't get locked when doing other things.
+            # This also might mean we should make a seperate class for application variables
+            # in charge of arbitrating access to them.
+            thread = threading.Thread(target = 
+                lambda: self.server.login(self.username_entry.get_text(), self.password_entry.get_text()))
+            thread.daemon = True
+            thread.start()
             self.connected = True 
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
