@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from ftplib import FTP
+import ftplib
 
 class Application:
     def __init__(self):
@@ -75,16 +76,16 @@ class Application:
         Gtk.main_quit(*args)
 
 ## Connect Tab
-    # Currently, the username and server values are hardcoded in. Eventually they will be grabbed from the UI
     def connectHandler(self, button):
         
-        #Connect to the server
+        # Connect to the server
         try:
             self.server = FTP(self.address_entry.get_text())
             self.server.login(self.username_entry.get_text(), self.password_entry.get_text())
-            self.connected = True #There is no built-in bool
-        except: #need a specific catch statement (right now it catches ALL errors, not just login)
-            print("Connection failed: Incorrect Login Information") 
+            self.connected = True 
+        # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
+        except ftplib.all_errors as err: 
+            print(err) 
     
     # Quits the current session
     def disconnectHandler(self,x):
