@@ -3,20 +3,29 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from ftplib import FTP
 import ftplib
 import threading
+from socket import gaierror 
 
 class ConnectionThread(threading.Thread):
     def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
     def run(self):
-        try:      
-            self.ref.connectioninfo.set_text("Connecting...")
-            self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
-            self.ref.connectioninfo.set_text("Connected")
-            self.ref.connected = True 
+        try:
+            if(self.ref.username_entry.get_text() == ""):
+                self.ref.connectioninfo.set_text("Please enter a username.")
+            elif(self.ref.password_entry.get_text() == ""):
+                self.ref.connectioninfo.set_text("Please enter a password.")
+            elif(self.ref.address_entry.get_text() == ""):
+                self.ref.connectioninfo.set_text("Please enter an address.")
+            else:
+                self.ref.connectioninfo.set_text("Connecting...")
+                self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
+                self.ref.connectioninfo.set_text("Connected")
+                self.ref.connected = True 
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
+
 
 class Application:
     def __init__(self):
@@ -94,12 +103,17 @@ class Application:
     def CN_connectHandler(self, button):
         
         # Connect to the server
-            self.server = FTP(self.address_entry.get_text())
-            # in charge of arbitrating access to them.
-            thread = ConnectionThread(self)
-            thread.daemon = True
-            thread.start()
-    
+            try:
+                self.server = FTP(self.address_entry.get_text())
+                thread = ConnectionThread(self)
+                thread.daemon = True
+                thread.start()
+            except gaierror:
+                self.connectioninfo.set_text("Address not found.")
+                return
+            except ConnectionRefusedError:
+                self.connectioninfo.set_text("Connection refused.")
+
     # Quits the current session
     def CN_disconnectHandler(self,x):
         if( (self.server != None) and self.connected):
