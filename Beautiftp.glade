@@ -123,6 +123,7 @@
                         <property name="receives_default">True</property>
                         <property name="use_action_appearance">False</property>
                         <property name="relief">none</property>
+                        <signal name="clicked" handler="LD_OkHandler" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -181,7 +182,7 @@
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="use_action_appearance">False</property>
-                        <signal name="clicked" handler="LDCancelHandler" swapped="no"/>
+                        <signal name="clicked" handler="LD_CancelHandler" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -261,7 +262,7 @@
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="xalign">0.55000001192092896</property>
-                <signal name="clicked" handler="connectHandler" swapped="no"/>
+                <signal name="clicked" handler="CN_connectHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">150</property>
@@ -296,7 +297,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="xalign">0.46000000834465027</property>
                 <property name="yalign">0.50999999046325684</property>
-                <signal name="clicked" handler="disconnectHandler" swapped="no"/>
+                <signal name="clicked" handler="CN_disconnectHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">23</property>
@@ -429,7 +430,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="deleteHandler" swapped="no"/>
+                <signal name="clicked" handler="BR_deleteHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">10</property>
@@ -445,7 +446,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="directoryHandler" swapped="no"/>
+                <signal name="clicked" handler="BR_directoryHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">21</property>
@@ -478,7 +479,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="uploadHandler" swapped="no"/>
+                <signal name="clicked" handler="BR_uploadHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">307</property>
@@ -494,7 +495,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="permissionsHandler" swapped="no"/>
+                <signal name="clicked" handler="BR_permissionsHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">454</property>
@@ -511,7 +512,7 @@
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="yalign">0.52999997138977051</property>
-                <signal name="clicked" handler="downloadHandler" swapped="no"/>
+                <signal name="clicked" handler="BR_downloadHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="x">157</property>
@@ -954,7 +955,7 @@
             <property name="receives_default">False</property>
             <property name="use_action_appearance">False</property>
             <property name="draw_indicator">True</property>
-            <signal name="clicked" handler="PCRecurseSubdirectoriesToggle" swapped="no"/>
+            <signal name="clicked" handler="PC_RecurseSubdirectoriesToggle" swapped="no"/>
           </object>
           <packing>
             <property name="x">8</property>
@@ -1043,7 +1044,7 @@
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="xalign">0.43000000715255737</property>
-            <signal name="clicked" handler="PCOKHandler" swapped="no"/>
+            <signal name="clicked" handler="PC_OKHandler" swapped="no"/>
           </object>
           <packing>
             <property name="x">291</property>
@@ -1077,6 +1078,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="FC_OkHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1091,6 +1093,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="FC_CancelHandler" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

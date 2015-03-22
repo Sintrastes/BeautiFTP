@@ -77,7 +77,7 @@ class Application:
         Gtk.main_quit(*args)
 
 ## Connect Tab
-    def connectHandler(self, button):
+    def CN_connectHandler(self, button):
         
         # Connect to the server
         try:
@@ -97,7 +97,7 @@ class Application:
             print(err) 
     
     # Quits the current session
-    def disconnectHandler(self,x):
+    def CN_disconnectHandler(self,x):
         if( (self.server != None) and self.connected):
             self.server.quit()
             self.connected = False
@@ -107,44 +107,44 @@ class Application:
         #self.openLoading(x)
 
 ## Browse tab
-    def deleteHandler(self,x):
+    def BR_deleteHandler(self,x):
         pass
 
-    def downloadHandler(self,x):
+    def BR_downloadHandler(self,x):
         pass
 
-    def uploadHandler(self,x):
+    def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
 
-    def permissionsHandler(self,x):
+    def BR_permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
-    def directoryHandler(self,x):
+    def BR_directoryHandler(self,x):
         pass
 
 #### Loading Window Handlers
-    def LDCancelHandler(self,x):
+    def LD_CancelHandler(self,x):
         print("test")
 
-    def LDOkHandler(self,x):
+    def LD_OkHandler(self,x):
         pass
 
 #### File Chooser Window Handlers
-    def FCCancelHandler(self,x):
+    def FC_CancelHandler(self,x):
         pass
-    def FCOkHandler(self,x):
+    def FC_OkHandler(self,x):
         pass
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
         pass
 
-    def PCOKHandler(self,x):
+    def PC_OKHandler(self,x):
         print(self.public_read.get_active())
 
-    def PCRecurseSubdirectoriesToggle(self,widget):
+    def PC_RecurseSubdirectoriesToggle(self,widget):
         if(self.recurse_subdirectories.get_active()):
             for x in self.recurse_buttons:
                 x.set_sensitive(True)
