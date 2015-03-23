@@ -19,13 +19,19 @@ class ConnectionThread(threading.Thread):
                 self.ref.connectioninfo.set_text("Please enter an address.")
             else:
                 self.ref.connectioninfo.set_text("Connecting...")
+                self.server = FTP(self.address_entry.get_text())
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
-
+        except gaierror:
+            self.connectioninfo.set_text("Address not found.")
+        except ConnectionRefusedError:
+            self.connectioninfo.set_text("Connection refused.")
+        except Exception as err:
+            self.ref.connectioninfo.set_text("Error: "+str(err))
 
 class Application:
     def __init__(self):
@@ -101,18 +107,11 @@ class Application:
 
 ## Connect Tab
     def CN_connectHandler(self, button):
-        
         # Connect to the server
-            try:
-                self.server = FTP(self.address_entry.get_text())
-                thread = ConnectionThread(self)
-                thread.daemon = True
-                thread.start()
-            except gaierror:
-                self.connectioninfo.set_text("Address not found.")
-                return
-            except ConnectionRefusedError:
-                self.connectioninfo.set_text("Connection refused.")
+        thread = ConnectionThread(self)
+        thread.daemon = True
+        thread.start()
+
 
     # Quits the current session
     def CN_disconnectHandler(self,x):
