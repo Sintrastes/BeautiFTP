@@ -126,22 +126,35 @@ class Application:
         #self.openLoading(x)
 
 ## Browse tab
+    #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
         pass
+        #if file:
+            #self.server.delete("file_name")
+        #elif directory:
+            #self.server.rmd("directory_name")
 
+    #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
         pass
+        #Can only download individual files, not whole directories
+        #self.server.retrbinary('RETR filename')
 
+    #TO DO: figure out how to get selected file name/path to command
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
+        
+        #upload selected file to current working directory on server
+        #self.server.storbinary("STOR filename")
+
 
     def BR_permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
     def BR_directoryHandler(self,x):
-        pass
+        print("Directory added.")
 
 #### Loading Window Handlers
     def LD_CancelHandler(self,x):
