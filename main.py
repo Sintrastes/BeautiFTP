@@ -19,7 +19,7 @@ class ConnectionThread(threading.Thread):
                 self.ref.connectioninfo.set_text("Please enter an address.")
             else:
                 self.ref.connectioninfo.set_text("Connecting...")
-                self.server = FTP(self.address_entry.get_text())
+                self.ref.server = FTP(self.address_entry.get_text())
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
