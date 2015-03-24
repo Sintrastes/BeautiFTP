@@ -92,6 +92,18 @@ class Application:
 
         ## FTP directory data
         self.directory_model = self.builder.get_object("Directory Model")
+        def getFiles(self):
+            self.directory_model = Gtk.ListStore(str)
+            parents = {}
+            for (path,dirs,files) in os.walk("home/"):
+                for subdir in dirs:
+                    parents[os.path.join(path,subdir)] = self.directory_model.append(parents.get(path,None),[subdir])
+                for item in files:
+                    tree = self.directory_model.append(parents.get(path,None),[item])
+            self.directory_display = Gtk.TreeView(self.directory_model)
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn("Title",renderer,text=0)
+            self.directory_display.append_column(column)
 
         # Open the welcome window
         self.openingWindow.show_all()
