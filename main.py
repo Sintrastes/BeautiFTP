@@ -168,10 +168,14 @@ class Application:
         self.permissionChange.show_all()
 
     #TO DO: Does this need to be a separate thread?
-    #       Get text from GUI
+    #       Implement different error handling?
     def BR_directoryHandler(self,x):
-        print("Directory added.")
-        self.server.mkd(self.directory_entry.get_text())
+        try:
+            new_directory = self.server.mkd(self.directory_entry.get_text())
+            print('Directory "%s" added.' % new_directory)
+
+        except:
+            print("Failed to create directory")
 
 #### TO DO
 #### Loading Window Handlers
