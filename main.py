@@ -137,7 +137,9 @@ class Application:
             print("Not connected")
         #self.openLoading(x)
 
+## TO DO: Do these all need to have multiprocessing implemented?
 ## Browse tab
+    
     #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
         pass
@@ -165,9 +167,13 @@ class Application:
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
+    #TO DO: Does this need to be a separate thread?
+    #       Get text from GUI
     def BR_directoryHandler(self,x):
         print("Directory added.")
+        #self.server.mkd("directory_path")
 
+#### TO DO
 #### Loading Window Handlers
     def LD_CancelHandler(self,x):
         print("test")
@@ -175,11 +181,13 @@ class Application:
     def LD_OkHandler(self,x):
         pass
 
+#### TO DO
 #### File Chooser Window Handlers
     def FC_CancelHandler(self,x):
         pass
     def FC_OkHandler(self,x):
         pass
+
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
