@@ -171,7 +171,7 @@ class Application:
     #       Get text from GUI
     def BR_directoryHandler(self,x):
         print("Directory added.")
-        #self.server.mkd("directory_path")
+        self.server.mkd(self.directory_entry.get_text())
 
 #### TO DO
 #### Loading Window Handlers
