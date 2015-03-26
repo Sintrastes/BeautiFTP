@@ -217,9 +217,9 @@ class Application:
     def FC_OkHandler(self,x):
         thread = UploadThread(self)
         thread.daemon = True
-        print(self.server)
-        print("file.txt")
-        thread.upload(self.server,"filename")
+        filename = self.filechooserdialog1.get_filename()
+        print(filename)
+        thread.upload(self.server, filename)
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
         thread = UploadThread(self)
