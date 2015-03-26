@@ -35,6 +35,7 @@ class UploadThread(threading.Thread):
         os.chdir(path)
         myfile = open(name,"r")
         ftp.storlines("STOR " + name, myfile)
+        
     else:
         os.chdir(path)
         myfile = open(name, "rb")
@@ -240,14 +241,14 @@ class Application:
         thread = UploadThread(self)
         thread.daemon = True
         filename = self.filechooserdialog1.get_filename()
-        print(filename)
         thread.upload(self.server, filename)
+        self.filechooserdialog1.hide()
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
         thread = UploadThread(self)
         thread.daemon = True
         thread.upload(self.server)
-
+        self.filechooserdialog1.hide()
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
