@@ -9,12 +9,7 @@ from socket import gaierror
 class UploadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
-        sedef upload(ftp, file):
-    ext = os.path.splitext(file)[1]
-    if ext in (".txt", ".htm", ".html"):
-        ftp.storlines("STOR " + file, open(file))
-    else:
-        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)lf.ref = ref
+        self.ref = ref
   def upload(ftp, file):
     ext = os.path.splitext(file)[1]
     if ext in (".txt", ".htm", ".html"):
