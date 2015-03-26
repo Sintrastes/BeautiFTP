@@ -3,6 +3,7 @@ from gi.repository import Gtk, Gdk, GdkPixbuf
 from ftplib import FTP
 import ftplib
 import threading
+import os
 from socket import gaierror 
 
 # TODO: Implement upload thread class
@@ -10,12 +11,12 @@ class UploadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
-  def upload(ftp, file):
-    ext = os.path.splitext(file)[1]
+  def upload(self,ftp, filename):
+    ext = os.path.splitext(filename)[1]
     if ext in (".txt", ".htm", ".html"):
-        ftp.storlines("STOR " + file, open(file))
+        ftp.storlines("STOR " + filename, open(filename))
     else:
-        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)
+        ftp.storbinary("STOR " + filename, open(filename, "rb"), 1024)
   
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
@@ -23,7 +24,7 @@ class DownloadThread(threading.Thread):
         threading.Thread.__init__(self)
         self.ref = ref
   
-  def getbinary(ftp, filename, outfile=None):
+  def getbinary(self, ftp, filename, outfile=None):
     # fetch a binary file
     if outfile is None:
         outfile = sys.stdout
@@ -218,10 +219,16 @@ class Application:
     def FC_CancelHandler(self,x):
         self.filechooserdialog1.hide()
     def FC_OkHandler(self,x):
-        pass
+        thread = UploadThread(self)
+        thread.daemon = True
+        print(self.server)
+        print("file.txt")
+        thread.upload(self.server,"filename")
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
-        pass
+        thread = UploadThread(self)
+        thread.daemon = True
+        thread.upload(self.server)
 
 
 #### Permission Change Window Handlers
