@@ -5,6 +5,21 @@ import ftplib
 import threading
 from socket import gaierror 
 
+# TODO: Implement upload thread class
+class UploadThread(threading.Thread):
+  def __init__(self,ref):
+        threading.Thread.__init__(self)
+        self.ref = ref
+  def run(self):
+
+# TODO: implement download thread class
+class DownloadThread(threading.Thread):
+  def __init__(self,ref):
+        threading.Thread.__init__(self)
+        self.ref = ref
+  def run(self):
+
+
 class ConnectionThread(threading.Thread):
     def __init__(self,ref):
         threading.Thread.__init__(self)
@@ -57,7 +72,7 @@ class Application:
         self.owner_read     = self.builder.get_object("Owner Read")
         self.owner_execute  = self.builder.get_object("Owner Execute")
 
-        self.group_write    = self.builder.get_object("Group Write")
+        self.group_write    =ft self.builder.get_object("Group Write")
         self.group_read     = self.builder.get_object("Group Read")
         self.group_execute  = self.builder.get_object("Group Execute")
 
