@@ -43,6 +43,8 @@ class ConnectionThread(threading.Thread):
             elif(self.ref.address_entry.get_text() == ""):
                 self.ref.connectioninfo.set_text("Please enter an address.")
             else:
+                if(self.ref.connected):
+                    self.ref.directory_model.clear()
                 self.ref.connectioninfo.set_text("Connecting...")
                 self.ref.server = FTP(self.ref.address_entry.get_text())
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
@@ -154,6 +156,7 @@ class Application:
     def CN_disconnectHandler(self,x):
         if( (self.server != None) and self.connected):
             self.server.quit()
+            self.directory_model.clear()
             self.connected = False
             self.connectioninfo.set_text("Disconnected")
             print("Disconnected")
