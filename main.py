@@ -179,7 +179,7 @@ class Application:
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
-        
+
         #upload selected file to current working directory on server
         #self.server.storbinary("STOR filename")
 
@@ -209,7 +209,7 @@ class Application:
 #### TO DO
 #### File Chooser Window Handlers
     def FC_CancelHandler(self,x):
-        pass
+        self.filechooserdialog1.hide()
     def FC_OkHandler(self,x):
         pass
     def fileActivated(self,x):
