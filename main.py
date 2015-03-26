@@ -9,7 +9,12 @@ from socket import gaierror
 class UploadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
-        self.ref = ref
+        sedef upload(ftp, file):
+    ext = os.path.splitext(file)[1]
+    if ext in (".txt", ".htm", ".html"):
+        ftp.storlines("STOR " + file, open(file))
+    else:
+        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)lf.ref = ref
   def upload(ftp, file):
     ext = os.path.splitext(file)[1]
     if ext in (".txt", ".htm", ".html"):
@@ -22,6 +27,13 @@ class DownloadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
+  
+  def getbinary(ftp, filename, outfile=None):
+    # fetch a binary file
+    if outfile is None:
+        outfile = sys.stdout
+    ftp.retrbinary("RETR " + filename, outfile.write)
+
 
 class ConnectionThread(threading.Thread):
     def __init__(self,ref):
