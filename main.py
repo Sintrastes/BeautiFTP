@@ -37,7 +37,7 @@ class UploadThread(threading.Thread):
         ftp.storlines("STOR " + name, myfile)
     else:
         os.chdir(path)
-        f = open(name, "rb")
+        myfile = open(name, "rb")
         ftp.storbinary("STOR " + name, myfile, 1024)
 
 # TODO: implement download thread class
