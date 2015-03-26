@@ -187,10 +187,6 @@ class Application:
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
 
-        #upload selected file to current working directory on server
-        #self.server.storbinary("STOR filename")
-
-
     def BR_permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
