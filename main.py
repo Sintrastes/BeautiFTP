@@ -6,6 +6,22 @@ import threading
 import os
 from socket import gaierror 
 
+# utiliy functions
+def getFile(x):
+    e = ""
+    while(x[len(x)-1] != '/'):
+       e = x[len(x)-1] + e
+       x = x[:len(x)-1]
+    return e
+
+def getPath(x):
+    while(x[len(x)-1] != "/"):
+        x = x[:len(x)-1]
+    return x
+
+def getPathFile(x):
+    return (getPath(x),getFile(x))
+
 # TODO: Implement upload thread class
 class UploadThread(threading.Thread):
   def __init__(self,ref):
@@ -13,10 +29,16 @@ class UploadThread(threading.Thread):
         self.ref = ref
   def upload(self,ftp, filename):
     ext = os.path.splitext(filename)[1]
+    print(filename)
+    (path,name) = getPathFile(filename)
     if ext in (".txt", ".htm", ".html"):
-        ftp.storlines("STOR " + filename, open(filename))
+        os.chdir(path)
+        f = open(name,"r")
+        ftp.storlines("STOR " + name, f)
     else:
-        ftp.storbinary("STOR " + filename, open(filename, "rb"), 1024)
+        os.chdir(path)
+        f = open(name, "rb")
+        ftp.storbinary("STOR " + name, f, 1024)
   
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
