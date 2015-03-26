@@ -10,15 +10,12 @@ class UploadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
-  def run(self):
 
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
-  def run(self):
-
 
 class ConnectionThread(threading.Thread):
     def __init__(self,ref):
