@@ -35,6 +35,21 @@ class ConnectionThread(threading.Thread):
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
+                # Populate Tree
+                ftp = self.ref.server.nlst()
+                print(ftp)
+                self.directory_model = Gtk.ListStore(str)
+                parents = None
+                for item in ftp:
+                    tree = self.directory_model.append()
+                    self.directory_model.set_value(tree,0,item)
+                    print(self.directory_model[tree][0])   
+                # Display Tree
+                self.directory_display = Gtk.TreeView(self.directory_model)
+                renderer = Gtk.CellRendererText()
+                column = Gtk.TreeViewColumn("Title",renderer,text=0)
+                self.directory_display.append_column(column)
+                self.directory_display.show_all()
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
@@ -104,18 +119,6 @@ class Application:
 
         ## FTP directory data
         self.directory_model = self.builder.get_object("Directory Model")
-        def getFiles(self):
-            self.directory_model = Gtk.ListStore(str)
-            parents = {}
-            for (path,dirs,files) in os.walk("home/"):
-                for subdir in dirs:
-                    parents[os.path.join(path,subdir)] = self.directory_model.append(parents.get(path,None),[subdir])
-                for item in files:
-                    tree = self.directory_model.append(parents.get(path,None),[item])
-            self.directory_display = Gtk.TreeView(self.directory_model)
-            renderer = Gtk.CellRendererText()
-            column = Gtk.TreeViewColumn("Title",renderer,text=0)
-            self.directory_display.append_column(column)
 
         # Open the welcome window
         self.openingWindow.show_all()
