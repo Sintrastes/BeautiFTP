@@ -10,7 +10,13 @@ class UploadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
-
+  def upload(ftp, file):
+    ext = os.path.splitext(file)[1]
+    if ext in (".txt", ".htm", ".html"):
+        ftp.storlines("STOR " + file, open(file))
+    else:
+        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)
+  
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
   def __init__(self,ref):
