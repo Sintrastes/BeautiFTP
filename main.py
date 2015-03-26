@@ -90,7 +90,7 @@ class Application:
         self.owner_read     = self.builder.get_object("Owner Read")
         self.owner_execute  = self.builder.get_object("Owner Execute")
 
-        self.group_write    =ft self.builder.get_object("Group Write")
+        self.group_write    = self.builder.get_object("Group Write")
         self.group_read     = self.builder.get_object("Group Read")
         self.group_execute  = self.builder.get_object("Group Execute")
 
