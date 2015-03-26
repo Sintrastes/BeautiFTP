@@ -33,13 +33,13 @@ class UploadThread(threading.Thread):
     (path,name) = getPathFile(filename)
     if ext in (".txt", ".htm", ".html"):
         os.chdir(path)
-        f = open(name,"r")
-        ftp.storlines("STOR " + name, f)
+        myfile = open(name,"r")
+        ftp.storlines("STOR " + name, myfile)
     else:
         os.chdir(path)
         f = open(name, "rb")
-        ftp.storbinary("STOR " + name, f, 1024)
-  
+        ftp.storbinary("STOR " + name, myfile, 1024)
+
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
   def __init__(self,ref):
