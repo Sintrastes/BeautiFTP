@@ -180,6 +180,9 @@ class Application:
         pass
     def FC_OkHandler(self,x):
         pass
+    def fileActivated(self,x):
+        # Activates when a file is double-clicked on.
+        pass
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
