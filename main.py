@@ -34,13 +34,19 @@ class ConnectionThread(threading.Thread):
                 self.ref.connectioninfo.set_text("Please enter an address.")
             else:
                 self.ref.connectioninfo.set_text("Connecting...")
+                self.ref.server = FTP(self.ref.address_entry.get_text())
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
-
+        except gaierror:
+            self.connectioninfo.set_text("Address not found.")
+        except ConnectionRefusedError:
+            self.connectioninfo.set_text("Connection refused.")
+        except Exception as err:
+            self.ref.connectioninfo.set_text("Error: "+str(err))
 
 class Application:
     def __init__(self):
@@ -101,6 +107,18 @@ class Application:
 
         ## FTP directory data
         self.directory_model = self.builder.get_object("Directory Model")
+        def getFiles(self):
+            self.directory_model = Gtk.ListStore(str)
+            parents = {}
+            for (path,dirs,files) in os.walk("home/"):
+                for subdir in dirs:
+                    parents[os.path.join(path,subdir)] = self.directory_model.append(parents.get(path,None),[subdir])
+                for item in files:
+                    tree = self.directory_model.append(parents.get(path,None),[item])
+            self.directory_display = Gtk.TreeView(self.directory_model)
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn("Title",renderer,text=0)
+            self.directory_display.append_column(column)
 
         # Open the welcome window
         self.openingWindow.show_all()
@@ -116,18 +134,11 @@ class Application:
 
 ## Connect Tab
     def CN_connectHandler(self, button):
-        
         # Connect to the server
-            try:
-                self.server = FTP(self.address_entry.get_text())
-                thread = ConnectionThread(self)
-                thread.daemon = True
-                thread.start()
-            except gaierror:
-                self.connectioninfo.set_text("Address not found.")
-                return
-            except ConnectionRefusedError:
-                self.connectioninfo.set_text("Connection refused.")
+        thread = ConnectionThread(self)
+        thread.daemon = True
+        thread.start()
+
 
     # Quits the current session
     def CN_disconnectHandler(self,x):
@@ -141,24 +152,47 @@ class Application:
             print("Not connected")
         #self.openLoading(x)
 
+## TO DO: Do these all need to have multiprocessing implemented?
 ## Browse tab
+    
+    #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
         pass
+        #if file:
+            #self.server.delete("file_name")
+        #elif directory:
+            #self.server.rmd("directory_name")
 
+    #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
         pass
+        #Can only download individual files, not whole directories
+        #self.server.retrbinary('RETR filename')
 
+    #TO DO: figure out how to get selected file name/path to command
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
+        
+        #upload selected file to current working directory on server
+        #self.server.storbinary("STOR filename")
+
 
     def BR_permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
+    #TO DO: Does this need to be a separate thread?
+    #       Implement different error handling?
     def BR_directoryHandler(self,x):
-        pass
+        try:
+            new_directory = self.server.mkd(self.directory_entry.get_text())
+            print('Directory "%s" added.' % new_directory)
 
+        except:
+            print("Failed to create directory")
+
+#### TO DO
 #### Loading Window Handlers
     def LD_CancelHandler(self,x):
         print("test")
@@ -166,11 +200,16 @@ class Application:
     def LD_OkHandler(self,x):
         pass
 
+#### TO DO
 #### File Chooser Window Handlers
     def FC_CancelHandler(self,x):
         pass
     def FC_OkHandler(self,x):
         pass
+    def fileActivated(self,x):
+        # Activates when a file is double-clicked on.
+        pass
+
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
