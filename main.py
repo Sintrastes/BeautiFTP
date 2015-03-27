@@ -28,6 +28,8 @@ class UploadThread(threading.Thread):
         threading.Thread.__init__(self)
         self.ref = ref
   def upload(self,ftp, filename):
+    self.ref.filechooserdialog1.hide()
+    self.ref.openLoading(None)
     ext = os.path.splitext(filename)[1]
     print(filename)
     (path,name) = getPathFile(filename)
@@ -35,11 +37,14 @@ class UploadThread(threading.Thread):
         os.chdir(path)
         myfile = open(name,"r")
         ftp.storlines("STOR " + name, myfile)
-        
     else:
         os.chdir(path)
         myfile = open(name, "rb")
         ftp.storbinary("STOR " + name, myfile, 1024)
+
+    self.ref.loading_status.set_text("Done!")
+    # TODO: Stop Nyan Cat animation.
+
 
 # TODO: implement download thread class
 class DownloadThread(threading.Thread):
@@ -140,6 +145,7 @@ class Application:
         self.canvas = self.builder.get_object("Canvas")
         self.loader=GdkPixbuf.PixbufAnimation.new_from_file("nyan2.gif")
         self.canvas.set_from_animation(self.loader)
+        self.loading_status   = self.builder.get_object("Loading Status")
 
         self.apply_all        = self.builder.get_object("Apply All")
         self.files_only       = self.builder.get_object("Files Only")
@@ -242,13 +248,12 @@ class Application:
         thread.daemon = True
         filename = self.filechooserdialog1.get_filename()
         thread.upload(self.server, filename)
-        self.filechooserdialog1.hide()
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
         thread = UploadThread(self)
         thread.daemon = True
         thread.upload(self.server)
-        self.filechooserdialog1.hide()
+        
 
 #### Permission Change Window Handlers
     def PC_Cancel_Handler(self,x):
