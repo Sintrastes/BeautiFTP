@@ -64,6 +64,7 @@ class ConnectionThread(threading.Thread):
         threading.Thread.__init__(self)
         self.ref = ref
     def run(self):
+        # TODO: Make it so new columns aren't added to the browser if a connection has already been made.
         try:
             if(self.ref.username_entry.get_text() == ""):
                 self.ref.connectioninfo.set_text("Please enter a username.")
@@ -181,7 +182,6 @@ class Application:
         thread.daemon = True
         thread.start()
 
-
     # Quits the current session
     def CN_disconnectHandler(self,x):
         if( (self.server != None) and self.connected):
@@ -197,6 +197,10 @@ class Application:
 
 ## TO DO: Do these all need to have multiprocessing implemented?
 ## Browse tab
+
+    def item_select(self,x,y,z):
+        # Activated when a row of the tree view is double-clicked
+        print("test")
     
     #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
@@ -212,7 +216,6 @@ class Application:
         #Can only download individual files, not whole directories
         #self.server.retrbinary('RETR filename')
 
-    #TO DO: figure out how to get selected file name/path to command
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
@@ -256,6 +259,8 @@ class Application:
         
 
 #### Permission Change Window Handlers
+    # TODO: Convert the checkboxes into the appropriate chmod code,
+    # chmod the selected file. (server.sendcmd('SITE CHMOD ___ ' + filename))
     def PC_Cancel_Handler(self,x):
         self.permissionChange.hide()
 
