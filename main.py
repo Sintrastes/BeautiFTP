@@ -94,26 +94,6 @@ class ConnectionThread(threading.Thread):
                         treeiter = self.ref.directory_model.append([item])  
                 pop_tree(self)
 
-                # Selection
-                def on_tree_selection_changed(selection):
-                    (model, treeiter) = selection.get_selected()
-                    if treeiter != None:
-                       # Check if subdirectory
-                       try:
-                           self.ref.server.cwd(selection)
-                           pop_tree(self)
-                           self.ref.directory_model.prepend("parent")
-                       except:
-                           if(selection == "parent"):
-                               self.ref.server.cwd("..")
-                               pop_tree(self)
-                           else:
-                               print("File")
-
-                # Select Folder/File
-                select = self.ref.directory_display.get_selection()
-                select.connect("changed", on_tree_selection_changed)
-
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
@@ -222,7 +202,26 @@ class Application:
 
     def item_select(self,x,y,z):
         # Activated when a row of the tree view is double-clicked
-        print("test")
+        # Selection
+        def on_tree_selection_changed(selection):
+            (model, treeiter) = selection.get_selected()
+            if treeiter != None:
+        # Check if subdirectory
+                try:
+                    self.ref.server.cwd(selection)
+                    pop_tree(self)
+                    self.ref.directory_model.prepend("parent")
+                    print("dir")
+                except:
+                    if(selection == "parent"):
+                        self.ref.server.cwd("..")
+                        pop_tree(self)
+                        self.ref.directory_model.prepend("parent")
+                else:
+                    print("File")
+        # Select Folder/File
+        select = self.ref.directory_display.get_selection()
+        select.connect("changed", on_tree_selection_changed)
     
     #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
