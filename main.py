@@ -80,17 +80,32 @@ class ConnectionThread(threading.Thread):
                 self.ref.server.login(self.ref.username_entry.get_text(), self.ref.password_entry.get_text())
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
-
+                
+                # Display Tree
                 self.ref.directory_display.show_all()
-
                 column = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
                 self.ref.directory_display.append_column(column)
                 self.ref.directory_model.clear()
-
                 # Populate Tree
                 ftp = self.ref.server.nlst()
                 for item in ftp:
-                    self.ref.directory_model.append([item])
+                    treeiter = self.ref.directory_model.append([item])  
+
+                # Selection
+                def on_tree_selection_changed(selection):
+                    (model, treeiter) = selection.get_selected()
+                    if treeiter != None:
+                       #print("You selected", model[treeiter][0])
+                       # Check if subdirectory
+                       try:
+                           self.ref.server.cwd(selection)
+                           self.ref.directory_model.prepend("parent")
+                       except:
+                           print("File")
+
+                # Select Folder/File
+                select = self.ref.directory_display.get_selection()
+                select.connect("changed", on_tree_selection_changed)
 
         # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
