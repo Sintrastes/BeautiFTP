@@ -101,7 +101,10 @@ class ConnectionThread(threading.Thread):
                            self.ref.server.cwd(selection)
                            self.ref.directory_model.prepend("parent")
                        except:
-                           print("File")
+                           if(selection == "parent"):
+                               self.ref.server.cwd("..")
+                           else:
+                               print("File")
 
                 # Select Folder/File
                 select = self.ref.directory_display.get_selection()
