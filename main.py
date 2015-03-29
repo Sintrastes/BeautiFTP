@@ -63,6 +63,7 @@ class ConnectionThread(threading.Thread):
     def __init__(self,ref):
         threading.Thread.__init__(self)
         self.ref = ref
+
     def run(self):
         # TODO: Make it so new columns aren't added to the browser if a connection has already been made.
         try:
@@ -81,20 +82,34 @@ class ConnectionThread(threading.Thread):
                 self.ref.connectioninfo.set_text("Connected")
                 self.ref.connected = True 
                 
-                # Display Tree
-                self.ref.directory_display.show_all()
-                column = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
-                self.ref.directory_display.append_column(column)
-                self.ref.directory_model.clear()
-
                 # Populate Tree
-                def pop_tree(self):
-                    ftp = self.ref.server.nlst()
-                    for item in ftp:
-                        treeiter = self.ref.directory_model.append([item])  
-                pop_tree(self)
+                self.ref.pop_tree()
 
-        # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
+            # TODO: Is this needed? I don't think it is.   
+            #    # Selection
+            #    def on_tree_selection_changed(selection):
+            #        (model, treeiter) = selection.get_selected()
+            #        if treeiter != None:
+            #           # Check if subdirectory
+            #           try:
+            #               print("cd")
+            #               print(selection)
+            #               self.ref.server.cwd(selection)
+            #               pop_tree(self)
+            #               self.ref.directory_model.prepend(["parent"])
+            #           except:
+            #               print(selection)
+            #               if(selection == ["parent"]):
+            #                   print("Parent clicked")
+            #                   self.ref.server.cwd("..")
+            #                   pop_tree(self)
+            #               else:
+            #                   print("File")     
+            # Select Folder/File
+            # select = self.ref.directory_display.get_selection()
+            # select.connect("changed", on_tree_selection_changed)
+    
+    # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
         except gaierror:
@@ -103,6 +118,7 @@ class ConnectionThread(threading.Thread):
             self.connectioninfo.set_text("Connection refused.")
         except Exception as err:
             self.ref.connectioninfo.set_text("Error: "+str(err))
+
 
 class Application:
     def __init__(self):
@@ -168,10 +184,15 @@ class Application:
         # Open the welcome window
         self.openingWindow.show_all()
 
+
+
 #### Opening Window Handler
     def openApp(self,widget):
         self.openingWindow.hide()
         self.mainWindow.show_all()
+
+        # Set Up the treeview
+        self.displayTree()
 
 #### Main window handlers
     def onDeleteWindow(self, *args):
@@ -180,9 +201,10 @@ class Application:
 ## Connect Tab
     def CN_connectHandler(self, button):
         # Connect to the server
-        thread = ConnectionThread(self)
-        thread.daemon = True
-        thread.start()
+        if(not self.connected):
+            thread = ConnectionThread(self)
+            thread.daemon = True
+            thread.start()
 
     # Quits the current session
     def CN_disconnectHandler(self,x):
@@ -199,29 +221,41 @@ class Application:
 
 ## TO DO: Do these all need to have multiprocessing implemented?
 ## Browse tab
+    def displayTree(self):
+        self.directory_display.show_all()
+        column = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
+        self.directory_display.append_column(column)
+        self.directory_model.clear()
 
-    def item_select(self,x,y,z):
+    def pop_tree(self):
+        self.directory_model.clear()
+        ftp = self.server.nlst()
+        curr_directory = self.server.pwd()
+        for item in ftp:
+            try:
+                self.server.cwd(item)
+                treeiter = self.directory_model.append([item+"/"])
+            except:
+                treeiter = self.directory_model.append([item])
+            finally:
+                self.server.cwd(curr_directory)
+            
+        if(self.server.pwd() != "/"):
+            self.directory_model.prepend(["../"])
+
+    def item_select(self,treeview,row,treeview_col):
         # Activated when a row of the tree view is double-clicked
-        # Selection
-        def on_tree_selection_changed(selection):
-            (model, treeiter) = selection.get_selected()
-            if treeiter != None:
-        # Check if subdirectory
-                try:
-                    self.ref.server.cwd(model[treeiter][0])
-                    pop_tree(self)
-                    self.ref.directory_model.prepend("parent")
-                    print("dir")
-                except:
-                    if(model[treeiter][0] == "parent"):
-                        self.ref.server.cwd("..")
-                        pop_tree(self)
-                        self.ref.directory_model.prepend("parent")
-                else:
-                    print("File")
-        # Select Folder/File
-        select = self.ref.directory_display.get_selection()
-        select.connect("changed", on_tree_selection_changed)
+        listiter = treeview.get_model().get_iter(Gtk.TreePath(row))
+        try:
+            self.server.cwd(treeview.get_model().get_value(listiter,0))
+            self.pop_tree()
+        except Exception as e:
+            print(e)
+            if(treeview.get_model().get_value(listiter,0) == "../"):
+                self.server.cwd("..")
+                pop_tree(self)
+            else:
+                print(e)        
     
     #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
@@ -251,6 +285,7 @@ class Application:
         try:
             new_directory = self.server.mkd(self.directory_entry.get_text())
             print('Directory "%s" added.' % new_directory)
+            self.pop_tree()
 
         except:
             print("Failed to create directory")
