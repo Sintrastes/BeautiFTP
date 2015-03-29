@@ -208,12 +208,12 @@ class Application:
             if treeiter != None:
         # Check if subdirectory
                 try:
-                    self.ref.server.cwd(selection)
+                    self.ref.server.cwd(model[treeiter][0])
                     pop_tree(self)
                     self.ref.directory_model.prepend("parent")
                     print("dir")
                 except:
-                    if(selection == "parent"):
+                    if(model[treeiter][0] == "parent"):
                         self.ref.server.cwd("..")
                         pop_tree(self)
                         self.ref.directory_model.prepend("parent")
