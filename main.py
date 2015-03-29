@@ -86,23 +86,27 @@ class ConnectionThread(threading.Thread):
                 column = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
                 self.ref.directory_display.append_column(column)
                 self.ref.directory_model.clear()
+
                 # Populate Tree
-                ftp = self.ref.server.nlst()
-                for item in ftp:
-                    treeiter = self.ref.directory_model.append([item])  
+                def pop_tree(self):
+                    ftp = self.ref.server.nlst()
+                    for item in ftp:
+                        treeiter = self.ref.directory_model.append([item])  
+                pop_tree(self)
 
                 # Selection
                 def on_tree_selection_changed(selection):
                     (model, treeiter) = selection.get_selected()
                     if treeiter != None:
-                       #print("You selected", model[treeiter][0])
                        # Check if subdirectory
                        try:
                            self.ref.server.cwd(selection)
+                           pop_tree(self)
                            self.ref.directory_model.prepend("parent")
                        except:
                            if(selection == "parent"):
                                self.ref.server.cwd("..")
+                               pop_tree(self)
                            else:
                                print("File")
 
