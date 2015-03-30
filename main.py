@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 from ftplib import FTP
 import ftplib
 import threading
 import os
-from socket import gaierror 
+from socket import gaierror
 
 # utiliy functions
 def getFile(x):
@@ -24,25 +24,34 @@ def getPathFile(x):
 
 # TODO: Implement upload thread class
 class UploadThread(threading.Thread):
-  def __init__(self,ref):
+  def __init__(self,ref,filename):
         threading.Thread.__init__(self)
         self.ref = ref
-  def upload(self,ftp, filename):
-    self.ref.filechooserdialog1.hide()
-    self.ref.openLoading(None)
-    ext = os.path.splitext(filename)[1]
-    print(filename)
-    (path,name) = getPathFile(filename)
+        self.filename = filename
+  def run(self):
+    print("1")
+    #self.ref.filechooserdialog1.hide()
+    print("1.1")
+    #self.ref.openLoading(None)
+    ext = os.path.splitext(self.filename)[1]
+    (path,name) = getPathFile(self.filename)
     if ext in (".txt", ".htm", ".html"):
         os.chdir(path)
+        print("2")
         myfile = open(name,"r")
-        ftp.storlines("STOR " + name, myfile)
+        print("3")
+        self.ref.server.storlines("STOR " + name, myfile)
+        print("4")
     else:
         os.chdir(path)
+        print("2")
         myfile = open(name, "rb")
-        ftp.storbinary("STOR " + name, myfile, 1024)
-
-    self.ref.loading_status.set_text("Done!")
+        print("3")
+        self.ref.server.storbinary("STOR " + name, myfile, 1024)
+        print("4")
+    self.ref.UL_done = True
+    #self.ref.loading_status.set_text("Done!")
+    #self.ref.pop_tree()
     # TODO: Stop Nyan Cat animation.
 
 
@@ -85,29 +94,15 @@ class ConnectionThread(threading.Thread):
                 # Populate Tree
                 self.ref.pop_tree()
 
-            # TODO: Is this needed? I don't think it is.   
-            #    # Selection
-            #    def on_tree_selection_changed(selection):
-            #        (model, treeiter) = selection.get_selected()
-            #        if treeiter != None:
-            #           # Check if subdirectory
-            #           try:
-            #               print("cd")
-            #               print(selection)
-            #               self.ref.server.cwd(selection)
-            #               pop_tree(self)
-            #               self.ref.directory_model.prepend(["parent"])
-            #           except:
-            #               print(selection)
-            #               if(selection == ["parent"]):
-            #                   print("Parent clicked")
-            #                   self.ref.server.cwd("..")
-            #                   pop_tree(self)
-            #               else:
-            #                   print("File")     
-            # Select Folder/File
-            # select = self.ref.directory_display.get_selection()
-            # select.connect("changed", on_tree_selection_changed)
+                #TODO: This shouldn't be here, but it works.  
+                # Selection handler
+                def on_tree_selection_changed(selection):
+                    model, treeiter = selection.get_selected()
+                    if treeiter != None:
+                        self.ref.selected = model[treeiter][0]
+                # Select Folder/File
+                select = self.ref.directory_display.get_selection()
+                select.connect("changed", on_tree_selection_changed) 
     
     # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
         except ftplib.all_errors as err: 
@@ -144,6 +139,7 @@ class Application:
         ## Browse Tab
         self.directory_entry = self.builder.get_object("Directory Entry")
         self.directory_display = self.builder.get_object("Directory Display")
+        self.browse_tab        = self.builder.get_object("Browse Tab")
 
         ## Permission Change Window
         self.owner_write    = self.builder.get_object("Owner Write")
@@ -177,6 +173,10 @@ class Application:
         self.server       = None
         self.connected    = False
         self.connected_to = ""
+        self.UL_done      = False
+
+        ## Browse Data
+        self.selected = ""
 
         ## FTP directory data
         self.directory_model = self.builder.get_object("Directory Model")
@@ -184,6 +184,8 @@ class Application:
         # Open the welcome window
         self.openingWindow.show_all()
 
+        # Run every 500 ms
+        GObject.timeout_add(10,self.clock_event)
 
 
 #### Opening Window Handler
@@ -229,17 +231,17 @@ class Application:
 
     def pop_tree(self):
         self.directory_model.clear()
-        ftp = self.server.nlst()
-        curr_directory = self.server.pwd()
-        for item in ftp:
-            try:
-                self.server.cwd(item)
-                treeiter = self.directory_model.append([item+"/"])
-            except:
-                treeiter = self.directory_model.append([item])
-            finally:
-                self.server.cwd(curr_directory)
-            
+        ls = []
+        self.server.retrlines('MLSD', ls.append)
+
+        for item in ls:
+            name = item.split(';').pop()
+            if 'type=dir' in item.split(';'):
+                self.directory_model.append([name.lstrip(' ')+"/"])
+            elif 'type=pdir' not in item.split(';'):
+                if(name.lstrip(' ') != '.'):
+                    self.directory_model.append([name.lstrip(' ')])
+
         if(self.server.pwd() != "/"):
             self.directory_model.prepend(["../"])
 
@@ -247,7 +249,7 @@ class Application:
         # Activated when a row of the tree view is double-clicked
         listiter = treeview.get_model().get_iter(Gtk.TreePath(row))
         try:
-            self.server.cwd(treeview.get_model().get_value(listiter,0))
+            self.server.cwd(treeview.get_model().get_value(listiter,0)[:-1])
             self.pop_tree()
         except Exception as e:
             print(e)
@@ -257,13 +259,13 @@ class Application:
             else:
                 print(e)        
     
-    #TO DO: need to know which directory/file selected after 
     def BR_deleteHandler(self,x):
-        pass
-        #if file:
-            #self.server.delete("file_name")
-        #elif directory:
-            #self.server.rmd("directory_name")
+        if(self.selected != ""):
+            if self.selected[len(self.selected)-1] != "/":
+                self.server.delete(self.selected)
+            else:
+                self.server.rmd(self.selected[:-1])
+            self.pop_tree()
 
     #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
@@ -293,27 +295,35 @@ class Application:
 #### TO DO
 #### Loading Window Handlers
     def LD_CancelHandler(self,x):
-        print("test")
+        # TODO: Halt connection
+        self.loadingScreen.hide()
+        self.loading_status.set_text("Loading...")
 
     def LD_OkHandler(self,x):
-        pass
+        self.loadingScreen.hide()
+        self.loading_status.set_text("Loading...")
 
 #### TO DO
 #### File Chooser Window Handlers
     def FC_CancelHandler(self,x):
         self.filechooserdialog1.hide()
     def FC_OkHandler(self,x):
-        thread = UploadThread(self)
-        thread.daemon = True
         filename = self.filechooserdialog1.get_filename()
-        thread.upload(self.server, filename)
+        thread = UploadThread(self,filename)
+        thread.daemon = True
+        print("test1")
+        thread.start()
+        self.filechooserdialog1.hide()
+        self.openLoading(None)        
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
-        thread = UploadThread(self)
+        filename = self.filechooserdialog1.get_filename()
+        thread = UploadThread(self,filename)
         thread.daemon = True
-        thread.upload(self.server)
-        
-
+        print("test1")
+        thread.start()
+        self.filechooserdialog1.hide()
+        self.openLoading(None)
 #### Permission Change Window Handlers
     # TODO: Convert the checkboxes into the appropriate chmod code,
     # chmod the selected file. (server.sendcmd('SITE CHMOD ___ ' + filename))
@@ -334,11 +344,21 @@ class Application:
     def PC_onDestroy(self,x):
         self.permissionChange.hide()
 
+    def clock_event(self):
+        if self.UL_done:
+            self.loading_status.set_text("Done!")
+            self.pop_tree()
+            self.UL_done = False
+        if self.connected:
+            self.browse_tab.set_sensitive(True)
+        if not self.connected:
+            self.browse_tab.set_sensitive(False)
+        return True
+
 #### Misc. Methods
     def openLoading(self, button):
         self.loadingScreen.connect('delete-event', lambda w, e: w.hide() or True)
         self.loadingScreen.show_all()
-
 def main():
     applicaton = Application()
     Gtk.main()
