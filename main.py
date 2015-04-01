@@ -350,7 +350,7 @@ class Application:
         g_mode = [self.group_read.get_active(), self.group_write.get_active(), self.group_execute.get_active()]
         p_mode = [self.public_read.get_active(), self.public_write.get_active(), self.public_execute.get_active()]
         mode = str(boolListToBin(o_mode)) + str(boolListToBin(g_mode)) + str(boolListToBin(p_mode))
-        self.server.sendcmd('SITE CHMOD ' + mode + ' ' + filename)
+        self.server.sendcmd('SITE CHMOD ' + mode + ' ' + self.selected)
         self.permissionChange.hide()
         self.pop_tree()
 
