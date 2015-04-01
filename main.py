@@ -29,6 +29,16 @@ def getMode(x):
             print(item[10:])
             return item[10:]
 
+def boolListToBin(x):
+    n = 0
+    i = 0
+    while x != []:
+        value = x.pop()
+        if value == True:
+            n += 2**i
+        i += 1
+    return n
+
 # TODO: Implement upload thread class
 class UploadThread(threading.Thread):
   def __init__(self,ref,filename):
@@ -336,7 +346,12 @@ class Application:
         self.permissionChange.hide()
 
     def PC_OKHandler(self,x):
-        print(self.public_read.get_active())
+        o_mode = [self.owner_read.get_active(), self.owner_write.get_active(), self.owner_execute.get_active()]
+        g_mode = [self.group_read.get_active(), self.group_write.get_active(), self.group_execute.get_active()]
+        p_mode = [self.public_read.get_active(), self.public_write.get_active(), self.public_execute.get_active()]
+        mode = str(boolListToBin(o_mode)) + str(boolListToBin(g_mode)) + str(boolListToBin(p_mode))
+        server.sendcmd('SITE CHMOD ' + mode + ' ' + filename)
+        self.permissionChange.hide()
 
     def PC_RecurseSubdirectoriesToggle(self,widget):
         if(self.recurse_subdirectories.get_active()):
