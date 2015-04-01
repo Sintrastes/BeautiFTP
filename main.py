@@ -180,6 +180,7 @@ class Application:
         self.connected    = False
         self.connected_to = ""
         self.UL_done      = False
+        self.DL_done      = False
 
         ## Browse Data
         self.selected = ""
@@ -274,11 +275,13 @@ class Application:
 
     #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
-        pass
+        downthread = DownloadThread(self)
+        downthread.start()
         #Can only download individual files, not whole directories
         if(self.selected[len(self.selected)-1] != "/"):
             os.chdir(expanduser("~")+"/Downloads")
             self.server.retrbinary('RETR '+self.selected,open(self.selected, 'wb').write)
+        self.openLoading(None)
 
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
