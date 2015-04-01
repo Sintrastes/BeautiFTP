@@ -352,6 +352,7 @@ class Application:
         mode = str(boolListToBin(o_mode)) + str(boolListToBin(g_mode)) + str(boolListToBin(p_mode))
         server.sendcmd('SITE CHMOD ' + mode + ' ' + filename)
         self.permissionChange.hide()
+        self.pop_tree()
 
     def PC_RecurseSubdirectoriesToggle(self,widget):
         if(self.recurse_subdirectories.get_active()):
