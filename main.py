@@ -23,6 +23,12 @@ def getPath(x):
 def getPathFile(x):
     return (getPath(x),getFile(x))
 
+def getMode(x):
+    for item in x:
+        if item[0:9] == "UNIX.mode":
+            print(item[10:])
+            return item[10:]
+
 # TODO: Implement upload thread class
 class UploadThread(threading.Thread):
   def __init__(self,ref,filename):
@@ -51,8 +57,8 @@ class UploadThread(threading.Thread):
         self.ref.server.storbinary("STOR " + name, myfile, 1024)
         print("4")
     self.ref.UL_done = True
-    #self.ref.loading_status.set_text("Done!")
-    #self.ref.pop_tree()
+    self.ref.loading_status.set_text("Done!")
+    self.ref.pop_tree()
     # TODO: Stop Nyan Cat animation.
 
 
@@ -230,7 +236,7 @@ class Application:
     def displayTree(self):
         self.directory_display.show_all()
         column0 = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
-        column1 = Gtk.TreeViewColumn("Permissions",Gtk.CellRendererText(),text=0)
+        column1 = Gtk.TreeViewColumn("Permissions",Gtk.CellRendererText(),text=1)
         self.directory_display.append_column(column0)
         self.directory_display.append_column(column1)
         self.directory_model.clear()
@@ -239,14 +245,14 @@ class Application:
         self.directory_model.clear()
         ls = []
         self.server.retrlines('MLSD', ls.append)
-
+        print(ls)
         for item in ls:
             name = item.split(';').pop()
             if 'type=dir' in item.split(';'):
-                self.directory_model.append([name.lstrip(' ')+"/","trolololol"])
+                self.directory_model.append([name.lstrip(' ')+"/",getMode(item.split(";"))])
             elif 'type=pdir' not in item.split(';'):
                 if(name.lstrip(' ') != '.'):
-                    self.directory_model.append([name.lstrip(' '),"trololol"])
+                    self.directory_model.append([name.lstrip(' '),getMode(item.split(";"))])
 
         if(self.server.pwd() != "/"):
             self.directory_model.prepend(["../"])
