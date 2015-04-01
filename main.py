@@ -44,18 +44,12 @@ class UploadThread(threading.Thread):
     (path,name) = getPathFile(self.filename)
     if ext in (".txt", ".htm", ".html"):
         os.chdir(path)
-        print("2")
         myfile = open(name,"r")
-        print("3")
         self.ref.server.storlines("STOR " + name, myfile)
-        print("4")
     else:
         os.chdir(path)
-        print("2")
         myfile = open(name, "rb")
-        print("3")
         self.ref.server.storbinary("STOR " + name, myfile, 1024)
-        print("4")
     self.ref.UL_done = True
     self.ref.loading_status.set_text("Done!")
     self.loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
@@ -106,11 +100,9 @@ class ConnectionThread(threading.Thread):
                 # Sets the selected variable to the currently selected item
                 # in the tree view.
                 def on_tree_selection_changed(selection):
-                    print("test")
                     model, treeiter = selection.get_selected()
                     if treeiter != None:
                         self.ref.selected = model[treeiter][0]
-                        print(self.ref.selected)
                 # Select Folder/File
                 select = self.ref.directory_display.get_selection()
                 select.connect("changed", on_tree_selection_changed) 
@@ -226,10 +218,8 @@ class Application:
             self.directory_model.clear()
             self.connected = False
             self.connectioninfo.set_text("Disconnected")
-            print("Disconnected")
         else:
             self.connectioninfo.set_text("Disconnected")
-            print("Not connected")
         #self.openLoading(x)
 
 ## TO DO: Do these all need to have multiprocessing implemented?
@@ -246,7 +236,6 @@ class Application:
         self.directory_model.clear()
         ls = []
         self.server.retrlines('MLSD', ls.append)
-        print(ls)
         for item in ls:
             name = item.split(';').pop()
             if 'type=dir' in item.split(';'):
@@ -326,7 +315,6 @@ class Application:
         filename = self.filechooserdialog1.get_filename()
         thread = UploadThread(self,filename)
         thread.daemon = True
-        print("test1")
         thread.start()
         self.filechooserdialog1.hide()
         self.openLoading(None)        
@@ -335,7 +323,6 @@ class Application:
         filename = self.filechooserdialog1.get_filename()
         thread = UploadThread(self,filename)
         thread.daemon = True
-        print("test1")
         thread.start()
         self.filechooserdialog1.hide()
         self.openLoading(None)
