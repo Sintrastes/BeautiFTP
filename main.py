@@ -52,7 +52,9 @@ class UploadThread(threading.Thread):
         self.ref.server.storbinary("STOR " + name, myfile, 1024)
     self.ref.UL_done = True
     self.ref.loading_status.set_text("Done!")
-    self.loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
+    loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
+    self.ref.canvas.set_from_animation(loader)
+    
     self.ref.pop_tree()
     # TODO: Stop Nyan Cat animation.
 
