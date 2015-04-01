@@ -76,11 +76,19 @@ class DownloadThread(threading.Thread):
         threading.Thread.__init__(self)
         self.ref = ref
   
-  def getbinary(self, ftp, filename, outfile=None):
+  def run(self):
     # fetch a binary file
-    if outfile is None:
-        outfile = sys.stdout
-    ftp.retrbinary("RETR " + filename, outfile.write)
+
+    #ftp.retrbinary("RETR " + filename, outfile.write)
+    if(self.ref.selected[len(self.ref.selected)-1] != "/"):
+           os.chdir(expanduser("~")+"/Downloads")
+           self.ref.server.retrbinary('RETR '+self.ref.selected,open(self.ref.selected, 'wb').write)    
+
+    self.ref.DL_done = True
+    self.ref.loading_status.set_text("Done!")
+    # Stop Nyan Cat Animation
+    loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
+    self.ref.canvas.set_from_animation(loader)
 
 
 class ConnectionThread(threading.Thread):
@@ -190,6 +198,7 @@ class Application:
         self.connected    = False
         self.connected_to = ""
         self.UL_done      = False
+        self.DL_done      = False
 
         ## Browse Data
         self.selected = ""
@@ -284,11 +293,11 @@ class Application:
 
     #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
-        pass
+        downthread = DownloadThread(self)
+        downthread.start()
         #Can only download individual files, not whole directories
-        if(self.selected[len(self.selected)-1] != "/"):
-            os.chdir(expanduser("~")+"/Downloads")
-            self.server.retrbinary('RETR '+self.selected,open(self.selected, 'wb').write)
+        
+        self.openLoading(None)
 
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
@@ -370,6 +379,9 @@ class Application:
             self.loading_status.set_text("Done!")
             self.pop_tree()
             self.UL_done = False
+        if self.DL_done:
+            self.loading_status.set_text("Done!")
+                    
         if self.connected:
             self.browse_tab.set_sensitive(True)
         if not self.connected:
