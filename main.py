@@ -5,6 +5,7 @@ import ftplib
 import threading
 import os
 from socket import gaierror
+from os.path import expanduser
 
 # utiliy functions
 def getFile(x):
@@ -95,11 +96,14 @@ class ConnectionThread(threading.Thread):
                 self.ref.pop_tree()
 
                 #TODO: This shouldn't be here, but it works.  
-                # Selection handler
+                # Sets the selected variable to the currently selected item
+                # in the tree view.
                 def on_tree_selection_changed(selection):
+                    print("test")
                     model, treeiter = selection.get_selected()
                     if treeiter != None:
                         self.ref.selected = model[treeiter][0]
+                        print(self.ref.selected)
                 # Select Folder/File
                 select = self.ref.directory_display.get_selection()
                 select.connect("changed", on_tree_selection_changed) 
@@ -225,8 +229,10 @@ class Application:
 ## Browse tab
     def displayTree(self):
         self.directory_display.show_all()
-        column = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
-        self.directory_display.append_column(column)
+        column0 = Gtk.TreeViewColumn("Files",Gtk.CellRendererText(),text=0)
+        column1 = Gtk.TreeViewColumn("Permissions",Gtk.CellRendererText(),text=0)
+        self.directory_display.append_column(column0)
+        self.directory_display.append_column(column1)
         self.directory_model.clear()
 
     def pop_tree(self):
@@ -237,10 +243,10 @@ class Application:
         for item in ls:
             name = item.split(';').pop()
             if 'type=dir' in item.split(';'):
-                self.directory_model.append([name.lstrip(' ')+"/"])
+                self.directory_model.append([name.lstrip(' ')+"/","trolololol"])
             elif 'type=pdir' not in item.split(';'):
                 if(name.lstrip(' ') != '.'):
-                    self.directory_model.append([name.lstrip(' ')])
+                    self.directory_model.append([name.lstrip(' '),"trololol"])
 
         if(self.server.pwd() != "/"):
             self.directory_model.prepend(["../"])
@@ -271,7 +277,9 @@ class Application:
     def BR_downloadHandler(self,x):
         pass
         #Can only download individual files, not whole directories
-        #self.server.retrbinary('RETR filename')
+        if(self.selected[len(self.selected)-1] != "/"):
+            os.chdir(expanduser("~")+"/Downloads")
+            self.server.retrbinary('RETR '+self.selected,open(self.selected, 'wb').write)
 
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)

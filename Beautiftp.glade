@@ -6,6 +6,8 @@
     <columns>
       <!-- column-name column0 -->
       <column type="gchararray"/>
+      <!-- column-name column1 -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="Loading Screen">
@@ -537,7 +539,7 @@
           <object class="GtkLabel" id="Browse">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="xalign">0.44999998807907104</property>
+            <property name="xalign">0.40000000596046448</property>
             <property name="ypad">8</property>
             <property name="label" translatable="yes">Browse</property>
             <property name="angle">0.050000000000000003</property>
