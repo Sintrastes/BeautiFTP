@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 from ftplib import FTP
 import ftplib
@@ -6,8 +6,10 @@ import threading
 import os
 from socket import gaierror
 from os.path import expanduser
+import wave, sys, pyaudio
 
-# utiliy functions
+### Utiliy functions ###
+
 def getFile(x):
     e = ""
     while(x[len(x)-1] != '/'):
@@ -39,38 +41,45 @@ def boolListToBin(x):
         i += 1
     return n
 
-# TODO: Implement upload thread class
 class UploadThread(threading.Thread):
   def __init__(self,ref,filename):
         threading.Thread.__init__(self)
         self.ref = ref
         self.filename = filename
   def run(self):
-    print("1")
-    #self.ref.filechooserdialog1.hide()
-    print("1.1")
-    #self.ref.openLoading(None)
     ext = os.path.splitext(self.filename)[1]
     (path,name) = getPathFile(self.filename)
     if ext in (".txt", ".htm", ".html"):
         os.chdir(path)
         myfile = open(name,"r")
         self.ref.server.storlines("STOR " + name, myfile)
+        os.chdir(self.ref.main_directory)
     else:
         os.chdir(path)
         myfile = open(name, "rb")
         self.ref.server.storbinary("STOR " + name, myfile, 1024)
+        os.chdir(self.ref.main_directory)
     self.ref.UL_done = True
     self.ref.loading_status.set_text("Done!")
-    # Stop Nyan Cat Animation
-    loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
-    self.ref.canvas.set_from_animation(loader)
-    
-    # Display directory contents
-    self.ref.pop_tree()
 
+    # Play sound!
+    try:
+        wf = wave.open('Tutturuu.wav', 'rb')
+        sound = wave.open('Tutturuu.wav')
+        p = pyaudio.PyAudio()
+        chunk = 1024
+        stream = p.open(format =
+            p.get_format_from_width(wf.getsampwidth()),
+            channels = wf.getnchannels(),
+            rate = wf.getframerate(),
+            output = True)
+        data = wf.readframes(chunk)
+        while data != '':
+            stream.write(data)
+            data = wf.readframes(chunk)
+    except:
+        pass
 
-# TODO: implement download thread class
 class DownloadThread(threading.Thread):
   def __init__(self,ref):
         threading.Thread.__init__(self)
@@ -83,13 +92,27 @@ class DownloadThread(threading.Thread):
     if(self.ref.selected[len(self.ref.selected)-1] != "/"):
            os.chdir(expanduser("~")+"/Downloads")
            self.ref.server.retrbinary('RETR '+self.ref.selected,open(self.ref.selected, 'wb').write)    
-
+           os.chdir(self.ref.main_directory)
     self.ref.DL_done = True
     self.ref.loading_status.set_text("Done!")
-    # Stop Nyan Cat Animation
-    loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
-    self.ref.canvas.set_from_animation(loader)
-
+    
+# Play sound!
+    try:
+        wf = wave.open('Tutturuu.wav', 'rb')
+        sound = wave.open('Tutturuu.wav')
+        p = pyaudio.PyAudio()
+        chunk = 1024
+        stream = p.open(format =
+            p.get_format_from_width(wf.getsampwidth()),
+            channels = wf.getnchannels(),
+            rate = wf.getframerate(),
+            output = True)
+        data = wf.readframes(chunk)
+        while data != '':
+            stream.write(data)
+            data = wf.readframes(chunk)
+    except:
+        pass    
 
 class ConnectionThread(threading.Thread):
     def __init__(self,ref):
@@ -97,7 +120,6 @@ class ConnectionThread(threading.Thread):
         self.ref = ref
 
     def run(self):
-        # TODO: Make it so new columns aren't added to the browser if a connection has already been made.
         try:
             if(self.ref.username_entry.get_text() == ""):
                 self.ref.connectioninfo.set_text("Please enter a username.")
@@ -117,7 +139,6 @@ class ConnectionThread(threading.Thread):
                 # Populate Tree
                 self.ref.pop_tree()
 
-                #TODO: This shouldn't be here, but it works.  
                 # Sets the selected variable to the currently selected item
                 # in the tree view.
                 def on_tree_selection_changed(selection):
@@ -126,9 +147,8 @@ class ConnectionThread(threading.Thread):
                         self.ref.selected = model[treeiter][0]
                 # Select Folder/File
                 select = self.ref.directory_display.get_selection()
-                select.connect("changed", on_tree_selection_changed) 
-    
-    # TODO: Need to make sure this catches all errors and displays an appropriate message for each error.
+                select.connect("changed", on_tree_selection_changed)
+                
         except ftplib.all_errors as err: 
             self.ref.connectioninfo.set_text("Could not connect: "+str(err))
         except gaierror:
@@ -202,7 +222,7 @@ class Application:
 
         ## Browse Data
         self.selected = ""
-
+        self.main_directory = os.getcwd()
         ## FTP directory data
         self.directory_model = self.builder.get_object("Directory Model")
 
@@ -244,7 +264,6 @@ class Application:
             self.connectioninfo.set_text("Disconnected")
         #self.openLoading(x)
 
-## TO DO: Do these all need to have multiprocessing implemented?
 ## Browse tab
     def displayTree(self):
         self.directory_display.show_all()
@@ -267,7 +286,7 @@ class Application:
                     self.directory_model.append([name.lstrip(' '),getMode(item.split(";"))])
 
         if(self.server.pwd() != "/"):
-            self.directory_model.prepend(["../"])
+            self.directory_model.prepend(["../",""])
 
     def item_select(self,treeview,row,treeview_col):
         # Activated when a row of the tree view is double-clicked
@@ -291,24 +310,26 @@ class Application:
                 self.server.rmd(self.selected[:-1])
             self.pop_tree()
 
-    #TO DO: need to know selected file name
     def BR_downloadHandler(self,x):
+        self.openLoading(None)
+        self.loading_status.set_text("Loading...")
+        self.loader=GdkPixbuf.PixbufAnimation.new_from_file("nyan2.gif")
+        self.canvas.set_from_animation(self.loader)
         downthread = DownloadThread(self)
         downthread.start()
-        #Can only download individual files, not whole directories
+        #TODO: Can only download individual files, not whole directories
         
-        self.openLoading(None)
-
     def BR_uploadHandler(self,x):
         self.filechooserdialog1.connect('delete-event', lambda w, e: w.hide() or True)
         self.filechooserdialog1.show_all()
+        self.loading_status.set_text("Loading...")
+        self.loader=GdkPixbuf.PixbufAnimation.new_from_file("nyan2.gif")
+        self.canvas.set_from_animation(self.loader)
 
     def BR_permissionsHandler(self,x):
         self.permissionChange.connect('delete-event', lambda w, e: w.hide() or True)
         self.permissionChange.show_all()
 
-    #TO DO: Does this need to be a separate thread?
-    #       Implement different error handling?
     def BR_directoryHandler(self,x):
         try:
             new_directory = self.server.mkd(self.directory_entry.get_text())
@@ -318,28 +339,24 @@ class Application:
         except:
             print("Failed to create directory")
 
-#### TO DO
-#### Loading Window Handlers
     def LD_CancelHandler(self,x):
-        # TODO: Halt connection
         self.loadingScreen.hide()
-        self.loading_status.set_text("Loading...")
+
 
     def LD_OkHandler(self,x):
         self.loadingScreen.hide()
-        self.loading_status.set_text("Loading...")
 
-#### TO DO
-#### File Chooser Window Handlers
     def FC_CancelHandler(self,x):
         self.filechooserdialog1.hide()
+
     def FC_OkHandler(self,x):
         filename = self.filechooserdialog1.get_filename()
         thread = UploadThread(self,filename)
         thread.daemon = True
         thread.start()
         self.filechooserdialog1.hide()
-        self.openLoading(None)        
+        self.openLoading(None)
+        
     def fileActivated(self,x):
         # Activates when a file is double-clicked on.
         filename = self.filechooserdialog1.get_filename()
@@ -348,9 +365,9 @@ class Application:
         thread.start()
         self.filechooserdialog1.hide()
         self.openLoading(None)
+
 #### Permission Change Window Handlers
-    # TODO: Convert the checkboxes into the appropriate chmod code,
-    # chmod the selected file. (server.sendcmd('SITE CHMOD ___ ' + filename))
+
     def PC_Cancel_Handler(self,x):
         self.permissionChange.hide()
 
@@ -376,12 +393,25 @@ class Application:
 
     def clock_event(self):
         if self.UL_done:
-            self.loading_status.set_text("Done!")
             self.pop_tree()
-            self.UL_done = False
-        if self.DL_done:
             self.loading_status.set_text("Done!")
-                    
+ 
+
+            # Stop Nyan Cat Animation
+            loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
+            self.canvas.set_from_animation(loader)
+            
+            self.UL_done = False
+
+        if self.DL_done:
+            self.pop_tree()
+
+            # Stop Nyan Cat Animation
+            loader=GdkPixbuf.PixbufAnimation.new_from_file("tmp-0.gif")
+            self.canvas.set_from_animation(loader)
+            
+            self.DL_done = False
+
         if self.connected:
             self.browse_tab.set_sensitive(True)
         if not self.connected:
@@ -392,7 +422,9 @@ class Application:
     def openLoading(self, button):
         self.loadingScreen.connect('delete-event', lambda w, e: w.hide() or True)
         self.loadingScreen.show_all()
+
 def main():
+    # Initalize and run the application
     applicaton = Application()
     Gtk.main()
 

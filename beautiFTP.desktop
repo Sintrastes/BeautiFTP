@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1
+Name=BeautiFTP
+Comment=test
+Path=/home/nate/code/python/beautiftp/
+Exec=/home/nate/code/python/beautiftp/main.py
+Icon=/home/nate/code/python/beautiftp/nyan2.gif
+Terminal=false
+Type=Application
+Categories=Application
