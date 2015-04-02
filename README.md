@@ -24,5 +24,5 @@ Ubuntu dependencies:
    * python3-pyaudio
 
 If you believe this list of dependencies is incorrect, or incomplete, please contact the authors with any 
-concerns.
+concerns. Certain features may not work with the incorrect versions of dependencies installed.
 
