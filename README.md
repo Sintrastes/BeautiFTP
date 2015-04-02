@@ -19,12 +19,12 @@ This software was tested on Ubuntu 14.04, has has the following dependencies:
 
 python 3  (3.4.0)
 
-** Python Libraries:
-    PyAudio (0.2.7)
-    pygobject (3.12.0)
+Python Libraries:
+   * PyAudio (0.2.7)
+   * pygobject (3.12.0)
 
-** Ubuntu dependencies:
-    python3-pyaudio
+Ubuntu dependencies:
+   * python3-pyaudio
 
 If you believe this list of dependencies is incorrect, or incomplete, please contact the authors with any 
 concerns.
