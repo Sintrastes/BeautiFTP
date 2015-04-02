@@ -5,9 +5,6 @@ BeautiFTP is a simple FTP client that supports uploading, downloading, deleting 
 
 BeautiFTP was created as a CSCI 355 (Computer networking) group programming project.
 
-Running
-=======
-
 To run BeautiFTP, you may either double click on the included BeautiFTP.desktop file, or run the application from the terminal as:
 
     ./main.py
